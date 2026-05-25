@@ -54,7 +54,7 @@
 </head>
 <body>
 <h1>贪吃蛇</h1>
-<div class="score">分数: <span id="score">0</span></div>
+<div class="score">分数: <span id="score">0</span>&nbsp;&nbsp;|&nbsp;&nbsp;时间: <span id="timer">00:00</span></div>
 <canvas id="canvas"></canvas>
 <div class="overlay" id="overlay">游戏结束</div>
 <button id="restart">重新开始</button>
@@ -66,13 +66,14 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
 const overlay = document.getElementById('overlay');
 
 const gridSize = 20;
 const tileCount = 21;
 canvas.width = canvas.height = gridSize * tileCount;
 
-let snake, food, dx, dy, score, gameLoop, paused, gameOver, speed, eatCount;
+let snake, food, dx, dy, score, gameLoop, paused, gameOver, speed, eatCount, timerSeconds, timerInterval;
 
 const colorSchemes = [
   { head: '#e94560', body: '#533483' },  // 红紫
@@ -97,6 +98,17 @@ function init() {
   gameOver = false;
   overlay.style.display = 'none';
   scoreEl.textContent = score;
+  timerSeconds = 0;
+  timerEl.textContent = '00:00';
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!paused && !gameOver) {
+      timerSeconds++;
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const s = String(timerSeconds % 60).padStart(2, '0');
+      timerEl.textContent = m + ':' + s;
+    }
+  }, 1000);
   placeFood();
   if (gameLoop) clearInterval(gameLoop);
   gameLoop = setInterval(update, speed);
@@ -150,6 +162,7 @@ function endGame() {
   overlay.textContent = '游戏结束';
   overlay.style.display = 'block';
   clearInterval(gameLoop);
+  clearInterval(timerInterval);
 }
 
 function draw() {
