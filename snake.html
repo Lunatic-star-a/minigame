@@ -137,6 +137,7 @@ function update() {
 
 function endGame() {
   gameOver = true;
+  overlay.textContent = '游戏结束';
   overlay.style.display = 'block';
   clearInterval(gameLoop);
 }
