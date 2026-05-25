@@ -72,7 +72,15 @@ const gridSize = 20;
 const tileCount = 20;
 canvas.width = canvas.height = gridSize * tileCount;
 
-let snake, food, dx, dy, score, gameLoop, paused, gameOver, speed;
+let snake, food, dx, dy, score, gameLoop, paused, gameOver, speed, eatCount;
+
+const colorSchemes = [
+  { head: '#e94560', body: '#533483' },  // 红紫
+  { head: '#0f9b8e', body: '#1a6b64' },  // 青绿
+  { head: '#f5a623', body: '#b87a1a' },  // 橙色
+  { head: '#4a9ef7', body: '#2d5f9e' },  // 蓝色
+  { head: '#a569bd', body: '#6c3483' },  // 紫色
+];
 
 function init() {
   snake = [
@@ -83,6 +91,7 @@ function init() {
   dx = 1;
   dy = 0;
   score = 0;
+  eatCount = 0;
   speed = 100;
   paused = false;
   gameOver = false;
@@ -121,6 +130,7 @@ function update() {
 
   if (head.x === food.x && head.y === food.y) {
     score += 10;
+    eatCount++;
     scoreEl.textContent = score;
     placeFood();
     if (speed > 40 && score % 50 === 0) {
@@ -143,20 +153,23 @@ function endGame() {
 }
 
 function draw() {
+  const ci = Math.floor(eatCount / 3) % colorSchemes.length;
+  const headColor = colorSchemes[ci].head;
+  const bodyColor = colorSchemes[ci].body;
+
   ctx.fillStyle = '#16213e';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // food
-  ctx.fillStyle = '#e94560';
+  ctx.fillStyle = headColor;
   ctx.shadowBlur = 10;
-  ctx.shadowColor = '#e94560';
+  ctx.shadowColor = headColor;
   ctx.fillRect(food.x * gridSize + 2, food.y * gridSize + 2, gridSize - 4, gridSize - 4);
   ctx.shadowBlur = 0;
 
   // snake
   snake.forEach((s, i) => {
-    const g = i === 0 ? '#0f3460' : '#1a1a2e';
-    ctx.fillStyle = i === 0 ? '#e94560' : '#533483';
+    ctx.fillStyle = i === 0 ? headColor : bodyColor;
     ctx.fillRect(s.x * gridSize + 1, s.y * gridSize + 1, gridSize - 2, gridSize - 2);
     if (i === 0) {
       ctx.fillStyle = '#fff';
